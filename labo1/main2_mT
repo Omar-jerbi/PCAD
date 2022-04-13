@@ -49,7 +49,9 @@ void* PRODAB(void* inizio_fine){
     }
 
 
-};
+pthread_barrier_wait(&barrier);
+
+}
 
 /////////////////////////////////////////////////////////////////
 int main(){
@@ -97,41 +99,44 @@ int main(){
 /********************************************************/
 
 
-R = malloc(M * sizeof(float*));
-for(int i = 0 ;i<M; i++){
-    R[i] = malloc(P * sizeof(float));
-}
-
-pthread_barrier_init(&barrier, NULL, 2);
-
-struct I_F i_f = {0, 2};
-// PRODAB(&i_f);
-struct I_F i_f2 = {2, 4};
-// PRODAB(&i_f2);
-
-
-pthread_t workers[2];
-
-pthread_create(&workers[0], NULL, PRODAB, &i_f);
-pthread_create(&workers[1], NULL, PRODAB, &i_f2);
-
-
-
-
-
-pthread_barrier_wait(&barrier);
-
-for(int i = 0; i<M; i++){
-    for(int j = 0; j< P; j++){
-        printf("%f ", R[i][j]);
+    R = malloc(M * sizeof(float*));
+    for(int i = 0 ;i<M; i++){
+        R[i] = malloc(P * sizeof(float));
     }
-    printf("\n");
-}
+
+    pthread_barrier_init(&barrier, NULL, 3);
+
+    pthread_t workers[2];
 
 
 
-for(int i = 0; i< 2; i++){
-    pthread_join(workers[i], NULL);
-}
 
+
+    struct I_F i_f = {0, 2};
+    // PRODAB(&i_f);
+    struct I_F i_f2 = {2, 4};
+    // PRODAB(&i_f2);
+
+    pthread_create(&workers[0], NULL, PRODAB, &i_f);
+    pthread_create(&workers[1], NULL, PRODAB, &i_f2);
+
+
+    pthread_barrier_wait(&barrier);
+
+    for(int i = 0; i<M; i++){
+        for(int j = 0; j< P; j++){
+            printf("%f ", R[i][j]);
+        }
+        printf("\n");
+    }
+
+
+
+
+
+    for(int i = 0; i< 2; i++){
+        pthread_join(workers[i], NULL);
+    }
+
+    pthread_barrier_destroy(&barrier);
 }
