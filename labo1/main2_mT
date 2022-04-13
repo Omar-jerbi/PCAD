@@ -27,7 +27,7 @@ struct I_F{ //indice di inizio e fine da passare a threads
 // partendo da 1, da "sinistra verso destra" e "dall'alto verso il basso" 
 
 
-
+ 
 
 void* PRODCAB(void* inizio_fine){
     struct I_F* arg = (struct I_F*)inizio_fine;
