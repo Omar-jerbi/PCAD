@@ -1,0 +1,137 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+
+pthread_barrier_t barrier;
+
+const int M = 4;
+const int N = 4;
+const int P = 2;
+
+
+float** A; //M*N
+float** B; //N*P
+float** R; //M*P
+float** C; //P*M
+
+
+struct I_F{ //indice di inizio e fine da passare a threads
+    int inizio;
+    int fine;
+};
+
+// le matrici di input A B C vengono riempite in automatico sequenzialmente 
+// partendo da 1, da "sinistra verso destra" e "dall'alto verso il basso" 
+
+
+
+
+void* PRODAB(void* inizio_fine){
+    struct I_F* arg = (struct I_F*)inizio_fine;
+
+  
+    for(int i = arg->inizio; i<arg->fine; i++){
+        float* r = malloc(P * sizeof(float)); //una riga di R
+        
+        for(int j = 0; j< P; j++){
+            float aux = 0;
+
+            for(int k = 0; k < M; k++){
+                aux +=  A[i][k] * B[k][j];
+            }
+
+            r[j] = aux;
+        }
+
+        R[i] = r;
+        
+    }
+
+
+};
+
+/////////////////////////////////////////////////////////////////
+int main(){
+/********************************************************/
+    A = malloc(M * sizeof(float*));
+    for(int i = 0 ;i<M; i++){
+        A[i] = malloc(N * sizeof(float));
+    }
+    int count = 1;
+    for(int i = 0; i< M; i++){
+        for(int j = 0; j<N ; j++){
+            A[i][j] = count;
+            count++;
+        }
+    }
+/********************************************************/
+    B = malloc(N * sizeof(float*));
+    for(int i = 0 ;i<N; i++){
+        B[i] = malloc(P * sizeof(float));
+    }
+    count = 1;
+    for(int i = 0; i< N; i++){
+        for(int j = 0; j<P ; j++){
+            B[i][j] = count;
+            count++;
+        }
+    }
+/********************************************************/
+    C = malloc(P * sizeof(float*));
+    for(int i = 0 ;i<P; i++){
+        C[i] = malloc(M * sizeof(float));
+    }
+    count = 1;
+    for(int i = 0; i< P; i++){
+        for(int j = 0; j<M ; j++){
+            C[i][j] = count;
+            count++;
+        }
+    }
+/********************************************************/
+    R = malloc(M * sizeof(float*));
+    for(int i = 0 ;i<M; i++){
+        R[i] = malloc(P * sizeof(float));
+    }
+/********************************************************/
+
+
+R = malloc(M * sizeof(float*));
+for(int i = 0 ;i<M; i++){
+    R[i] = malloc(P * sizeof(float));
+}
+
+pthread_barrier_init(&barrier, NULL, 2);
+
+struct I_F i_f = {0, 2};
+// PRODAB(&i_f);
+struct I_F i_f2 = {2, 4};
+// PRODAB(&i_f2);
+
+
+pthread_t workers[2];
+
+pthread_create(&workers[0], NULL, PRODAB, &i_f);
+pthread_create(&workers[1], NULL, PRODAB, &i_f2);
+
+
+
+
+
+pthread_barrier_wait(&barrier);
+
+for(int i = 0; i<M; i++){
+    for(int j = 0; j< P; j++){
+        printf("%f ", R[i][j]);
+    }
+    printf("\n");
+}
+
+
+
+for(int i = 0; i< 2; i++){
+    pthread_join(workers[i], NULL);
+}
+
+}
