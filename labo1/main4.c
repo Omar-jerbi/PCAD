@@ -5,43 +5,18 @@
 #include <sys/time.h>
 #include <string.h>
 
-/* RISULTATI SU ALCUNE ESECUZIONI
-    con matrici di piccole dimensioni (8 8 4):
-        SINGLE TH:
-            INPUT: 1 * S +-= 70us
-            INPUT: * 1 S +-= 70us
-            INPUT: 8 4 S +-= 90us
-        MULTI TH:
-            INPUT: 1 * M +-= 300us
-            INPUT: 8 * M +-= 600us
-            INPUT: * 4 M +-= 400us
-        
-    con matrici di grandi dimensioni (80 80 40):
-        SINGLE TH:
-            INPUT: 1 1 S +-= 15000us // 0,014s
-            INPUT: 1 40 S +-= 5000us // 0,005s
-            INPUT: 80 1 S +-= 5000us // 0,005s
-            INPUT: 8 4 S +-= 90us
-        MULTI TH:
-            INPUT: 1 * M +-= 300us
-            INPUT: 8 * M +-= 600us
-            INPUT: * 4 M +-= 400us
-*/ 
-
-
-
 
 
 pthread_barrier_t barrierAB;
 pthread_barrier_t barrierCR;
 
 
-const int M = 80;
-const int N = 80;
-const int P = 40;
-// const int M = 8;
-// const int N = 8;
-// const int P = 4;
+//const int M = 80;
+//const int N = 80;
+//const int P = 40;
+ const int M = 8;
+ const int N = 8;
+ const int P = 4;
 
 
 float** A; //M*N //8*8
