@@ -9,9 +9,8 @@ import java.util.concurrent.ConcurrentMap;
 
 /*	COMMENTI SUL LABORATORIO
  *  la parte che ho trovato piu' complicata da implementare e' stata
- *  il metodo chiudi() , dopo svariati tentativi credo che questa soluzione 
- *  con mappa  nome_evento -> [posti, flag chiuso] funzioni ma se cosi' non fosse
- *   apprezzerei molto un parere sicuramente piu' solido del mio
+ *  il metodo chiudi() , dopo svariati tentativi mi sembra che questa soluzione 
+ *  con mappa  nome_evento -> [posti, flag chiuso] funzioni.
  */
 
 
@@ -59,7 +58,7 @@ public class MainV6 {
 		public synchronized void aggiungi(EVNAMES eve, int i) {
 			if(eventi.get(eve)[1] == 1) {//aggiunta posti ad un evento rimosso in iterazione precedente
 				eventi.remove(eve);
-				crea(eve, i);//ri-creazione
+				crea(eve, i);//ri-creazione, con posti = i (si poteva anche ricreare con posti = 0)
 			}else {
 			eventi.replace(eve,  new Integer[] {eventi.get(eve)[0] + i, 0});
 			System.out.println(eve.toString() +"  --AGGIUNTI posti: "+i+"  --TOT= "+eventi.get(eve)[0]);
@@ -71,7 +70,7 @@ public class MainV6 {
 
 
 		public synchronized void chiudi(EVNAMES eve){
-			eventi.replace(eve,  new Integer[] {0, 1}); // 0 posti, 1 = chiuso
+			eventi.replace(eve,  new Integer[] {0, 1}); // posti 0 ; flag 1 = chiuso
 			notify();
 		}
 
@@ -81,7 +80,7 @@ public class MainV6 {
 			while(eventi.get(eve) == null || eventi.get(eve)[0] < postiRichiesti) {
 				wait();
 				if(eventi.get(eve) != null)
-					if(eventi.get(eve)[1] == 1) 
+					if(eventi.get(eve)[1] == 1)//quando arriva la notify() da chiudi() 
 						break;	
 			}
 			
